@@ -37,3 +37,4 @@ docker exec -it <node-name> bash
 - [Certified Kubernetes Administrator (CKA) Course Notes](https://github.com/kodekloudhub/certified-kubernetes-administrator-course)
 - [kind Official Documentation](https://kind.sigs.k8s.io/)
 - [k9s](https://k9scli.io/)
+- [popeye](https://github.com/derailed/popeye)

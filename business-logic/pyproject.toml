@@ -1,0 +1,13 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "django-app"
+version = "1"
+dependencies = [
+    "django",
+    "opentelemetry-sdk",
+    "opentelemetry-instrumentation-django",
+    "requests"
+]

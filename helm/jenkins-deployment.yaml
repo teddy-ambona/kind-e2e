@@ -22,11 +22,12 @@ spec:
         resources: {}
         env:
             # Install Jenkins programmatically, not from GUI.
-          - name: JENKINS_JAVA_OPTS
+          - name: JAVA_OPTS
             value: -Djenkins.install.runSetupWizard=false
         ports:
           - name: http-port
             containerPort: 8080
+            protocol: TCP
           - name: jnlp-port
             containerPort: 50000
         volumeMounts:
