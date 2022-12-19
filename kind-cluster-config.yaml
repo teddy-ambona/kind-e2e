@@ -33,3 +33,7 @@ nodes:
   - containerPort: 30200
     # Jenkins will be accessible on http://localhost:8080
     hostPort: 8080
+  # The node port of the business-logic service is going to be 30300 as well
+  # - containerPort: 30300
+  #   # Django endpoints will be accessible on http://localhost:8000
+  #   hostPort: 8000

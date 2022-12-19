@@ -32,3 +32,14 @@ data:
     help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
 EOF
 
+kubectl apply -f helm/metallb-native.yaml
+
+echo "Waiting for Metal LB pod to be ready. Timeout=90s"
+kubectl wait --namespace metallb-system \
+                --for=condition=ready pod \
+                --selector=app=metallb \
+                --timeout=90s
+
+kubectl apply -f helm/metallb-config.yaml
+kubectl apply -f helm/load-balancer.yaml
+kubectl port-forward service/front-end-service 8080:8080

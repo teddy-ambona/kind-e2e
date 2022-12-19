@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: front-end
+  name: front-end
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: front-end
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: front-end
+    spec:
+      containers:
+        # Pull image from local registry
+      - image: localhost:5001/nodejs-app
+        name: nodejs-app
+        resources: {}
+        ports:
+          - name: http-port
+            containerPort: 8080
+            protocol: TCP
+status: {}

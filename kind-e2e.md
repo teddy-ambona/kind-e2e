@@ -19,6 +19,7 @@ Security: use https://github.com/kubescape/kubescape for scanning running cluste
 Plan > Code > Build > Testing > Release > Deploy: in financial-data-api
 Operate > Monitor: in this project
 
+> The guide is intended for development, and not for a production deployment
 > State questions to ask before designing a k8s cluster
 > explain how to use the VS code extension for k8s to avoid using the terminal --> tuto here https://www.youtube.com/watch?v=Si6og3Wa2Hg
 > or use K9S? https://k9scli.io/  BOTH should be used in parrallel https://ellin.com/2020/05/28/tools-every-kubernetes-developer-should-have/
@@ -92,14 +93,11 @@ TODO:
 
 > deploy DB
 
-> how to only expose front-end with local DNS?
-   > http://<some IP>/
-   > using Load balancer external IP. Need to do it with Metallb https://kind.sigs.k8s.io/docs/user/loadbalancer/
-
 > deploy front-end (CSS and Node.Js):
-   > http:<some IP>/  which is the landing page of the website, it should have a slow page and fast loading page
+   > http:<some IP>/ which is the landing page of the website, it should have a slow page and fast loading page
    > http:<some IP>/slow-page
    > http:<some IP>/fast-page
+   > need to render page based on port used for front-end
 
 > setup istio
    > https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/
@@ -115,7 +113,7 @@ TODO:
 
 ====================================================
 Ideas:
-	1 - Implement Redis on the cluster
+	1 - Implement Redis on the cluster for real time app
 	2 - Canary deployment with Flagger? Or with Istio? cf https://geekflare.com/kubernetes-tools/
 	3 - MinIO ? https://github.com/minio/operator/blob/master/README.md
 

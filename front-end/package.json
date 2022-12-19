@@ -1,0 +1,14 @@
+{
+    "name": "front_end_app",
+    "version": "1.0.0",
+    "description": "Node.js on Docker",
+    "author": "Teddy Ambona",
+    "main": "server.js",
+    "scripts": {
+      "start": "node server.js"
+    },
+    "dependencies": {
+      "express": "^4.18",
+      "axios": "^1.2"
+    }
+}

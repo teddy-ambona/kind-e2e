@@ -163,5 +163,9 @@ cython_debug/
 .vscode/
 .devcontainer
 
+# NodeJS
+node_modules
+npm-debug.log
+
 # File that contains secret variables
 secrets.txt
