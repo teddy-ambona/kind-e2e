@@ -28,11 +28,11 @@ nodes:
   image: kindest/node:v1.24.7@sha256:577c630ce8e509131eab1aea12c022190978dd2f745aac5eb1fe65c0807eb315
   # Extra port mappings is used to port forward to the kind nodes.
   # This is a cross-platform option to get traffic into your kind cluster.
-  extraPortMappings:
-  # The node port of the jenkins service is going to be 30200 as well
-  - containerPort: 30200
-    # Jenkins will be accessible on http://localhost:8080
-    hostPort: 8080
+  # extraPortMappings:
+  # # The node port of the jenkins service is going to be 30200 as well
+  # - containerPort: 30200
+  #   # Jenkins will be accessible on http://localhost:8080
+  #   hostPort: 8080
   # The node port of the business-logic service is going to be 30300 as well
   # - containerPort: 30300
   #   # Django endpoints will be accessible on http://localhost:8000

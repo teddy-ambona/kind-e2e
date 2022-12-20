@@ -10,9 +10,6 @@ Self-contained CICD for testing purpose. Equivalent to sandbox environment.
 > Add Let's encrypt?
 > Use kubernetes-in-docker? https://www.conjur.org/blog/tutorial-spin-up-your-kubernetes-in-docker-cluster-and-they-will-come/
 
-Microservices: 1 front-end API + 1 business-logic-api + 1 DB POD (https://kubernetes.io/docs/tasks/run-application/run-replicated-stateful-application/)
-Observability: Local Prometheus and Grafana
-Tracing: openTelemetry and Jaeger
 Security: use https://github.com/kubescape/kubescape for scanning running cluster? and Trivy for scanning manifest and docker images?
 ===============================
 
@@ -67,6 +64,15 @@ why do we use microk8s vs minikube: https://www.itprotoday.com/cloud-computing-a
  > show IP tables and explain how kube-proxy works
  > ingress controller/resources (with Istio? Nginx could also be a solutionss)
  > Istio gateway
+ > We are installing Istio with the demo profile for testing purpose https://istio.io/latest/docs/setup/additional-setup/config-profiles/
+ > how to access dashboard UI https://istio.io/latest/docs/setup/platform-setup/kind/#setup-dashboard-ui-for-kind
+ > run `istioctl analyze` to check any issue with the configuration
+ > need to add logs in front-end
+ > If you see "no healthy upstream" while trying to access the web-app, wait for a couple of seconds until the app is up and running and that should work.
+ > Create custom dashboard on Grafana
+ > automatically open jaeger/grafana/website after cluster creation
+ > Add spans in slow endpoint to simulate nested functions
+ > Add a note on the fact that you need to add the "app" label to your deployments for the istio graphs to work
 =================================
 Implementation:
 

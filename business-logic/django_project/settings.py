@@ -25,7 +25,8 @@ SECRET_KEY = 'django-insecure-73jd-)v1_x!!bzkld43&nhm+-i^qs@r)buy%37nmc0#88yjy1i
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# We add the name of the ClusterIP service in the allowed host names.
+ALLOWED_HOSTS = ['business-logic']
 
 
 # Application definition

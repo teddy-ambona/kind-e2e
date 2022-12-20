@@ -11,8 +11,9 @@ Demo project with Kubernetes IN Docker local cluster
 
 ## 2 - Prerequisites
 
-- [Docker](https://docs.docker.com/get-docker/)
+- [Docker](https://docs.docker.com/get-docker/)(8.0 GB of memory and 4 CPUs)
 - [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
+- [istioctl](https://istio.io/latest/docs/setup/getting-started/#download)
 
 ## 3 - Quickstart
 
@@ -28,14 +29,30 @@ In order to SSH into a node, we run:
 docker exec -it <node-name> bash
 ```
 
+Run these commands to access:
+
+- Website: [http:localhost:8080/demo-app/](http:localhost:8080/demo-app/)
+- Grafana: `istioctl dashboard grafana`
+- Jaeger: `istioctl dashboard jaeger`
+- Kiali: `istioctl dashboard kiali`
+
 ## 4 - Project file structure
 
+## Istio as a service Mesh
 
 ## - Accessing the cluster
 
-To access the cluster from external we will need Metallb. Metallb is a baremetal loadbalancer project for kubernetes that implements a k8s LoadBalancer without necessarily being in a hosted cloud. . Don't forget to check out the [load balancer section](https://kind.sigs.k8s.io/docs/user/loadbalancer/) in the kind documentation
+There are several ways to access the cluster from external. On Linux you can simply access the cluster using http://<LOAD-BALANCER-EXTERNAL-IP>:8080/demo-app. If you are on Windows you can use [Metallb](https://kind.sigs.k8s.io/docs/user/loadbalancer/) (baremetal loadbalancer project for kubernetes) that implements a k8s LoadBalancer without necessarily being in a hosted cloud. This works if you are on Windows but if you are running docker on MacOS like me you probably have noticed that Docker MacOS has some networking “deficiencies” and these can be overcome by installing a networking shim as explained in [this tutorial](https://www.thehumblelab.com/kind-and-metallb-on-mac/). However in this demo I used [port forwarding](https://kubernetes.io/docs/tasks/access-application-cluster/port-forward-access-application-cluster/) which is a safer way to access the application (for testing purpose) in the cluster, and this will work of any platform :smiley:. You can then access the app using http://localhost:8080/demo-app/.
 
-Running docker on MacOS has some “deficiencies” that can be overcome by installing a networking shim as explained in [this tutorial](https://www.thehumblelab.com/kind-and-metallb-on-mac/). In this demo (since I am writing this from a MacBook Pro) I used [port forwarding](https://kubernetes.io/docs/tasks/access-application-cluster/port-forward-access-application-cluster/) to access the application in the cluster. you can then access the app using http://localhost:8000, and if you are running this on windows you should also be able to reach the load balancer at http://<LOAD-BALANCER-EXTERNAL-IP>:8000.
+### Add workflow diagram with Kiali
+
+kubectl port mapping --> istio ingress --> front-end service --> front-end pod
+
+## Grafana dashboard
+
+## Jaeger UI
+
+## Kiali
 
 ## Clean up
 

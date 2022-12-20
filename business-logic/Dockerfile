@@ -12,7 +12,7 @@ WORKDIR /app
 # Set environment variables
 # Python won’t try to write .pyc files on the import of source modules
 ENV PYTHONDONTWRITEBYTECODE 1
-# Ensuer that the stdout and stderr streams are sent straight to terminal
+# Ensure that the stdout and stderr streams are sent straight to terminal
 ENV PYTHONUNBUFFERED 1
 
 # Install requirements.txt in new instruction to benefit from the layer caching system.

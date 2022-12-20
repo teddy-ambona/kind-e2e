@@ -32,14 +32,45 @@ data:
     help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
 EOF
 
-kubectl apply -f helm/metallb-native.yaml
+# Install Istio
+istioctl install --set profile=demo -y
 
-echo "Waiting for Metal LB pod to be ready. Timeout=90s"
-kubectl wait --namespace metallb-system \
-                --for=condition=ready pod \
-                --selector=app=metallb \
-                --timeout=90s
+# Add a namespace label to instruct Istio to automatically inject Envoy sidecar proxies
+# when you deploy your application later:
+kubectl label namespace default istio-injection=enabled
 
-kubectl apply -f helm/metallb-config.yaml
-kubectl apply -f helm/load-balancer.yaml
-kubectl port-forward service/front-end-service 8080:8080
+kubectl apply -f helm/business-logic-deployment.yaml
+kubectl apply -f helm/business-logic-service.yaml
+kubectl apply -f helm/front-end-deployment.yaml
+kubectl apply -f helm/front-end-service.yaml
+
+# Setup kind dashboard
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+
+# Create a ServiceAccount and ClusterRoleBinding to provide admin access to the newly created cluster
+kubectl create serviceaccount -n kubernetes-dashboard admin-user
+kubectl create clusterrolebinding -n kubernetes-dashboard admin-user --clusterrole cluster-admin --serviceaccount=kubernetes-dashboard:admin-user
+
+# To login to Dashboard, you need a Bearer Token. Use the following command to store the token in a variable.
+token=$(kubectl -n kubernetes-dashboard create token admin-user)
+
+# Display the token using the echo command and copy it to use for logging into Dashboard.
+echo $token
+
+# Associate this application with the Istio gateway:
+kubectl apply -f helm/app_gateway.yaml
+
+# Install add-ons. cf https://istio.io/latest/docs/ops/integrations/
+# Grafana
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.16/samples/addons/grafana.yaml
+
+# Prometheus
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.16/samples/addons/prometheus.yaml
+
+# Jaeger
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.16/samples/addons/jaeger.yaml
+
+# Kiali
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.16/samples/addons/kiali.yaml
+
+# kubectl port-forward service/istio-ingressgateway 8080:http2 -n istio-system

@@ -3,10 +3,17 @@
 import os
 import sys
 
+# More info on Open Telemetry here:
+# https://github.com/open-telemetry/opentelemetry-python/blob/main/docs/examples/django/README.rst
+from opentelemetry.instrumentation.django import DjangoInstrumentor
 
 def main():
-    """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_project.settings')
+
+    # This call is what makes the Django application be instrumented
+    DjangoInstrumentor().instrument()
+
+    """Run administrative tasks."""
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

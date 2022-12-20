@@ -3,7 +3,7 @@ apiVersion: v1
 metadata:
   name: front-end-service
 spec:
-  type: LoadBalancer
+  type: ClusterIP
   selector:
     app: front-end
   ports:

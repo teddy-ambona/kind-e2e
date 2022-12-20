@@ -3,18 +3,15 @@ kind: Service
 metadata:
   name: business-logic
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
     - name: http-port
       protocol: TCP
-      # Port 8000 is internal to the kubernetes cluster and can be used when one application wants to communicate
-      # with another application using business-logic:8000
-      port: 8000
+      # Port 8080 is internal to the kubernetes cluster and can be used when one application wants to communicate
+      # with another application using business-logic:8080
+      port: 8080
 
       # This is the port exposed within the pod (different from container port) 
       targetPort: 8000
-
-      # Node port 30300 makes the service accessible from outside the cluster using http://<node ip>:30200
-      nodePort: 30300
   selector:
     app: business-logic

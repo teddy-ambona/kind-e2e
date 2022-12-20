@@ -7,9 +7,9 @@ spec:
   ports:
     - name: http-port
       protocol: TCP
-      # Port 8080 is internal to the kubernetes cluster and can be used when one application wants to communicate
+      # Port 8008 is internal to the kubernetes cluster and can be used when one application wants to communicate
       # with another application using jenkins:8080
-      port: 8080
+      port: 8008
 
       # This is the port exposed within the pod (different from container port) 
       targetPort: 8080
