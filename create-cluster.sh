@@ -73,4 +73,7 @@ kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.16/samp
 # Kiali
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.16/samples/addons/kiali.yaml
 
+# Setup default tracing config
+istioctl install -f helm/tracing.yaml -y
+
 # kubectl port-forward service/istio-ingressgateway 8080:http2 -n istio-system

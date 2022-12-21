@@ -9,5 +9,7 @@ dependencies = [
     "django",
     "opentelemetry-sdk",
     "opentelemetry-instrumentation-django",
+    "opentelemetry-propagator-b3",
+    "opentelemetry-exporter-zipkin",
     "requests"
 ]

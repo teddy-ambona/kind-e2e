@@ -22,8 +22,8 @@ app.get('/slow-page', (req, res) => {
   axios.get(BL_HOST.concat('/slow-endpoint')).then(resp => {
 
     console.log(resp.data);
+    res.send('Response from Django:'.concat(resp.data))
   })
-  res.send('Hello Slow!')
 });
 
 app.get('/fast-page', (req, res) => {

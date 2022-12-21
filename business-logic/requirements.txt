@@ -11,17 +11,30 @@ certifi==2022.12.7
 charset-normalizer==2.1.1
     # via requests
 deprecated==1.2.13
-    # via opentelemetry-api
+    # via
+    #   opentelemetry-api
+    #   opentelemetry-propagator-b3
 django==4.1.4
     # via django-app (business-logic/pyproject.toml)
 idna==3.4
     # via requests
 opentelemetry-api==1.15.0
     # via
+    #   opentelemetry-exporter-zipkin-json
+    #   opentelemetry-exporter-zipkin-proto-http
     #   opentelemetry-instrumentation
     #   opentelemetry-instrumentation-django
     #   opentelemetry-instrumentation-wsgi
+    #   opentelemetry-propagator-b3
     #   opentelemetry-sdk
+opentelemetry-exporter-zipkin==1.15.0
+    # via django-app (business-logic/pyproject.toml)
+opentelemetry-exporter-zipkin-json==1.15.0
+    # via
+    #   opentelemetry-exporter-zipkin
+    #   opentelemetry-exporter-zipkin-proto-http
+opentelemetry-exporter-zipkin-proto-http==1.15.0
+    # via opentelemetry-exporter-zipkin
 opentelemetry-instrumentation==0.36b0
     # via
     #   opentelemetry-instrumentation-django
@@ -30,8 +43,13 @@ opentelemetry-instrumentation-django==0.36b0
     # via django-app (business-logic/pyproject.toml)
 opentelemetry-instrumentation-wsgi==0.36b0
     # via opentelemetry-instrumentation-django
-opentelemetry-sdk==1.15.0
+opentelemetry-propagator-b3==1.15.0
     # via django-app (business-logic/pyproject.toml)
+opentelemetry-sdk==1.15.0
+    # via
+    #   django-app (business-logic/pyproject.toml)
+    #   opentelemetry-exporter-zipkin-json
+    #   opentelemetry-exporter-zipkin-proto-http
 opentelemetry-semantic-conventions==0.36b0
     # via
     #   opentelemetry-instrumentation-django
@@ -41,8 +59,13 @@ opentelemetry-util-http==0.36b0
     # via
     #   opentelemetry-instrumentation-django
     #   opentelemetry-instrumentation-wsgi
+protobuf==3.20.3
+    # via opentelemetry-exporter-zipkin-proto-http
 requests==2.28.1
-    # via django-app (business-logic/pyproject.toml)
+    # via
+    #   django-app (business-logic/pyproject.toml)
+    #   opentelemetry-exporter-zipkin-json
+    #   opentelemetry-exporter-zipkin-proto-http
 sqlparse==0.4.3
     # via django
 typing-extensions==4.4.0

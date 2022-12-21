@@ -16,7 +16,7 @@ Security: use https://github.com/kubescape/kubescape for scanning running cluste
 Plan > Code > Build > Testing > Release > Deploy: in financial-data-api
 Operate > Monitor: in this project
 
-> The guide is intended for development, and not for a production deployment
+> fill in the links I've left blank aka ()
 > State questions to ask before designing a k8s cluster
 > explain how to use the VS code extension for k8s to avoid using the terminal --> tuto here https://www.youtube.com/watch?v=Si6og3Wa2Hg
 > or use K9S? https://k9scli.io/  BOTH should be used in parrallel https://ellin.com/2020/05/28/tools-every-kubernetes-developer-should-have/
@@ -44,7 +44,6 @@ why do we use microk8s vs minikube: https://www.itprotoday.com/cloud-computing-a
     > configure RBAC for secrets
     > secrets should be stored in 3rd party secret store provider like AWS/ Azure/ GCP...
     > use Helm Secrets?
- > use init containers?
  > Liveness and Readiness Probes
  > use kubeconfig at $HOME/.kube/config  (dont forget to add current-context for defaulting to dev)
     > then $ kubectl config use-context prod-user@production
@@ -55,6 +54,8 @@ why do we use microk8s vs minikube: https://www.itprotoday.com/cloud-computing-a
     > time bound
     > object bound
  
+ > explain what each file is doing (below file tree)
+ > port forwarding will stop if you change the cluster, you need to start forwarding again for the app to work.
  > Ingress isolation? maybe too much for this demo since there will be only 2 apps
  > use persistent volume and pvc? should add a note saying that for production use we shouldn't save data on the node itself.
     > or storage class? overkill for this demo
@@ -73,6 +74,8 @@ why do we use microk8s vs minikube: https://www.itprotoday.com/cloud-computing-a
  > automatically open jaeger/grafana/website after cluster creation
  > Add spans in slow endpoint to simulate nested functions
  > Add a note on the fact that you need to add the "app" label to your deployments for the istio graphs to work
+ > add istio diagram https://istio.io/latest/docs/ops/deployment/architecture/ 
+   > explain what envoy and istiod are
 =================================
 Implementation:
 
@@ -80,8 +83,9 @@ Simulate high workload and observe how it scales?
 
 memory of a pod can go above its limit, it will then be terminated. CPU can't go over limit --> need to show that in grafana
 
-deployment: 2 replicas of each APIcu
-> use same Docker image, just use entrypoint and CMD for running different versions of it? or simply use different config file?
+deployment: 2 replicas of each API
+
+> by default istio instruments your services, but we want some fine grained tracing. Thats why we implement the Open Telemetry (OTel) 
 ====================================================
 > CloudWatch Dashboards is not widely used in the industry [https://www.reddit.com/r/aws/comments/8qbtvf/why_not_cloudwatch_dashboards/]
 	> interface is ugly
@@ -93,20 +97,14 @@ TODO:
       > 2 master nodes + 2 worker nodes + 2 etcd
 
 > deploy business-logic with Django
-   > http:business-logic.demo-app/slow-endpoint  this endpoint should be calling nested functions and the DB
-   > http:business-logic.demo-app/fast-endpoint this endpoint is not calling the DB and returns fast.
    > inject secrets as environment variables
 
 > deploy DB
 
 > deploy front-end (CSS and Node.Js):
-   > http:<some IP>/ which is the landing page of the website, it should have a slow page and fast loading page
-   > http:<some IP>/slow-page
-   > http:<some IP>/fast-page
+
    > need to render page based on port used for front-end
 
-> setup istio
-   > https://istio.io/latest/docs/tasks/traffic-management/ingress/ingress-control/
 
 > add instrumentation
    > use open-telemetry in python (https://github.com/open-telemetry/opentelemetry-python)
