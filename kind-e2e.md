@@ -72,7 +72,6 @@ why do we use microk8s vs minikube: https://www.itprotoday.com/cloud-computing-a
  > If you see "no healthy upstream" while trying to access the web-app, wait for a couple of seconds until the app is up and running and that should work.
  > Create custom dashboard on Grafana
  > automatically open jaeger/grafana/website after cluster creation
- > Add spans in slow endpoint to simulate nested functions
  > Add a note on the fact that you need to add the "app" label to your deployments for the istio graphs to work
  > add istio diagram https://istio.io/latest/docs/ops/deployment/architecture/ 
    > explain what envoy and istiod are
@@ -99,19 +98,16 @@ TODO:
 > deploy business-logic with Django
    > inject secrets as environment variables
 
-> deploy DB
-
 > deploy front-end (CSS and Node.Js):
-
    > need to render page based on port used for front-end
 
-
-> add instrumentation
-   > use open-telemetry in python (https://github.com/open-telemetry/opentelemetry-python)
-   > use opentelemetry with NodeJs
-
 > prometheus /grafana
-
+   > 1 dashboard with:
+      > Pod CPU/Memory usage
+      > Logs
+      > filters:
+         - namespace
+         - date
 > Jenkins
    > need to mount volume so that Jenkins has access to local files
 

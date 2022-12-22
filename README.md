@@ -1,5 +1,24 @@
 # kind-e2e
 
+- [1 - Target setup](#1---target-setup)
+- [2 - Prerequisites](#2---prerequisites)
+- [3 - Quickstart](#3---quickstart)
+- [4 - Project file structure](#4---project-file-structure)
+- [5 - Istio as a service Mesh](#5---istio-as-a-service-mesh)
+- [6 - Accessing the cluster](#6---accessing-the-cluster)
+- [7 - Distributed tracing](#7---distributed-tracing)
+  - [A - Meet Jaeger UI](#a---meet-jaeger-ui)
+  - [B - Context propagation](#b---context-propagation)
+  - [C - So what do traces look like?](#c---so-what-do-traces-look-like)
+- [8 - Grafana dashboard](#8---grafana-dashboard)
+- [9 - Kiali](#9---kiali)
+- [10 - Jenkins](#10---jenkins)
+- [11 - Clean up](#11---clean-up)
+- [12 - TODO](#12---todo)
+- [13 - Useful commands](#13---useful-commands)
+- [14 - Tools that make your life easier](#14---tools-that-make-your-life-easier)
+- [15 - Useful resources](#15---useful-resources)
+
 Demo project with Kubernetes IN Docker local cluster
 
 **IMPORTANT: This guide is intended for development, and not for a production deployment.**
@@ -15,7 +34,7 @@ Demo project with Kubernetes IN Docker local cluster
 
 - [Docker](https://docs.docker.com/get-docker/)(8.0 GB of memory and 4 CPUs)
 - [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
-- [istioctl](https://istio.io/latest/docs/setup/getting-started/#download)
+- [istioctl](https://istio.io/latest/docs/setup/getting-started/#download)(v1.16.1 has been used for this demo)
 
 ## 3 - Quickstart
 
@@ -40,9 +59,43 @@ Run these commands to access:
 
 ## 4 - Project file structure
 
-## Istio as a service Mesh
+```text
+.
+├── business-logic/
+│   ├── django_project/
+│   │   └── ...
+│   ├── pages/
+│   │   └── ...
+│   ├── Dockerfile
+│   ├── manage.py
+│   ├── pyproject.toml
+│   └── requirements.txt
+├── docs/
+│   └── ...
+├── front-end/
+│   ├── public_html/
+│   │   ├── assets/
+│   │   │   └── ...
+│   │   └── index.html
+│   ├── Dockerfile
+│   ├── LICENSE.txt
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── server.js
+│   └── tracing.js
+├── helm/
+├── jenkins/
+├── .dockerignore
+├── .gitignore
+├── create-cluster.sh
+├── kind-cluster-config.yaml
+├── Makefile
+├── README.md
+```
 
-## - Accessing the cluster
+## 5 - Istio as a service Mesh
+
+## 6 - Accessing the cluster
 
 There are several ways to access the cluster from external. On Linux you can simply access the cluster using http://<LOAD-BALANCER-EXTERNAL-IP>:8080/demo-app. If you are on Windows you can use [Metallb](https://kind.sigs.k8s.io/docs/user/loadbalancer/) (baremetal loadbalancer project for kubernetes) that implements a k8s LoadBalancer without necessarily being in a hosted cloud. This works if you are on Windows but if you are running docker on MacOS like me you probably have noticed that Docker MacOS has some networking “deficiencies” and these can be overcome by installing a networking shim as explained in [this tutorial](https://www.thehumblelab.com/kind-and-metallb-on-mac/). However in this demo I used [port forwarding](https://kubernetes.io/docs/tasks/access-application-cluster/port-forward-access-application-cluster/) which is a safer way to access the application (for testing purpose) in the cluster, and this will work of any platform :smiley:. You can then access the app using http://localhost:8080/demo-app/.
 
@@ -50,9 +103,7 @@ There are several ways to access the cluster from external. On Linux you can sim
 
 kubectl port mapping --> istio ingress --> front-end service --> front-end pod
 
-## Grafana dashboard
-
-## Distributed tracing
+## 7 - Distributed tracing
 
 Distributed tracing enables users to track a request through mesh that is distributed across multiple services. This allows a deeper understanding about request latency, serialization and parallelism via visualization.
 
@@ -60,7 +111,9 @@ Istio leverages Envoy’s distributed tracing feature to provide tracing integra
 
 Note that the default sampling rate is 1%, which means that 99% of the traces won't get reported. For testing purpose we want to see all traces so I've set the sampling rate to 100% in [tracing.yaml]()
 
-### Meet Jaeger UI
+By default Istio provides service-to-service tracing without context propagation, so if service A calls B which calls C, you will get two traces A -> B and B -> C. For this demo we want something more practical such as instrumenting our application code rather than simply observing services. For this we make use of OpenTelemetry (OTel) which is the [recommended instrumentation SDK](https://www.jaegertracing.io/docs/1.40/getting-started/#instrumentation). The OTel SDK implemented within our Django and NodeJS web-apps will allow us to create custom spans.
+
+### A - Meet Jaeger UI
 
 Jaeger is a distributed tracing system released as open source by Uber Technologies. It is used for monitoring and troubleshooting microservices-based distributed systems, including:
 
@@ -72,21 +125,43 @@ Jaeger is a distributed tracing system released as open source by Uber Technolog
 
 You can find details about how Jaeger works in the official [documentation](https://www.jaegertracing.io/docs/1.23/architecture/).
 
-By default Istio provides service-to-service tracing without context propagation, so if service A calls B which calls C, you will get two traces A -> B and B -> C. For this demo we want something more practical such as instrumenting our application code rather than simply observing services. For this we make the use of OpenTelemetry (OTel) which is the [recommended instrumentation SDK](https://www.jaegertracing.io/docs/1.40/getting-started/#instrumentation). The OTel SDK implemented within our Django and NodeJS web-apps will allow us to create custom spans. A high-level diagram of how instrumentation has been instrumented in this demo is provided below:
+A high-level diagram of how instrumentation has been instrumented in this demo is provided below:
 
-<img src="./docs/diagrams/jaeger.drawio.png" width="850"/>
+<img src="./docs/diagrams/jaeger.drawio.png" width="500"/>
 
 Note that the jaeger/all-in-one container is deployed through the [Istio add-on](https://istio.io/latest/docs/ops/integrations/jaeger/#installation). In case you are wondering why do we use a Zipkin exporter if we have a Jaeger backend, Jaeger backend has a [Zipkin compatible endpoint](https://www.jaegertracing.io/docs/1.40/getting-started/#all-in-one) listening on port 9411. We can then use `http://zipkin.istio-system.svc.cluster.local:9411/api/v2/spans` to send our spans to the Jaeger collector.
+
+### B - Context propagation
 
 Since we are using Zipkin agent, [Istio documentation](https://istio.io/latest/docs/tasks/observability/distributed-tracing/overview/) states that the B3 multi-header format should be forwarded. [B3](https://github.com/openzipkin/b3-propagation#multiple-headers) specification elaborates identifiers used to place an operation in a trace tree. For instance, the sampling decision will be made in-process and won't be collected and reported to the tracing system.
 
 Although Istio proxies can automatically send spans, extra information is needed to join those spans into a single trace. Applications must propagate this information in HTTP headers, so that when proxies send spans, the backend can join them together into a single trace.
 
-To do this, the front-end must collect headers from each incoming request and forward the headers to all outgoing requests triggered by that incoming request. This has been done [here]() in our NodeJS application.
+To do this, the front-end must collect headers from each incoming request and forward the headers to all outgoing requests triggered by that incoming request. This has been done [here]() in our NodeJS application. At the time of this writing the OTel js library does not have any plugin for axios so I had to manually propagate the context.
 
-## Kiali
+Here is a snapshot of what the front-end sends to the business-logic backend:
 
-## Clean up
+<img src="./docs/img/webhooksite.png" width="850"/>
+
+The B3 headers have been injected by OTel.
+
+### C - So what do traces look like?
+
+Select the trace you want to inspect. let's select the slow page endpoint:
+
+<img src="./docs/img/jaeger_ui.png" width="850"/>
+
+Latencies can be identified in the Gant diagram. Requests originate from the Ingress gateway and get propagated through the services. The bottom span "data_transformation" is the one that makes the request last roughly 3secs. Indeed there is a [time.sleep(3)]() voluntarily added in this span for demonstration purpose.
+
+<img src="./docs/img/slow_page_trace.png" width="850"/>
+
+## 8 - Grafana dashboard
+
+## 9 - Kiali
+
+## 10 - Jenkins
+
+## 11 - Clean up
 
 ```
 # Delete kind cluster
@@ -96,10 +171,10 @@ kind delete cluster --name demo-cluster
 docker kill kind-registry
 ```
 
-## 5 - TODO
+## 12 - TODO
 
 
-## Useful commands
+## 13 - Useful commands
 
 Restart pods (after config change for example):
 
@@ -107,15 +182,15 @@ Restart pods (after config change for example):
 kubectl rollout restart deployment <deployment_name> -n <namespace>
 ```
 
-## Tools that make your life easier
+## 14 - Tools that make your life easier
 
 [k9s](https://k9scli.io/): For quick k8s cluster interaction (you can stop typing the time-consuming kubectl commands :smiley:)
 
 <img src="./docs/img/k9s.png" width="850"/>
 
-## 6 - Useful resources
+## 15 - Useful resources
 
 - [Certified Kubernetes Administrator (CKA) Course Notes](https://github.com/kodekloudhub/certified-kubernetes-administrator-course)
 - [kind Official Documentation](https://kind.sigs.k8s.io/)
-
 - [popeye](https://github.com/derailed/popeye)
+- [webhook.site](https://webhook.site): to inspect what your HTTP requests look like from a receiver perpective, very useful when you play with API instrumentation

@@ -20,6 +20,17 @@ spec:
       - image: localhost:5001/django-app
         name: django-app
         resources: {}
+        env:
+        - name: ZIPKIN_URL
+          value: http://zipkin.istio-system.svc.cluster.local:9411/api/v2/spans
+        - name: DB_HOST
+          value: postgresdb.default.svc.cluster.local:5432
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_USERNAME
+          value: postgres
+        - name: DB_PASSWORD
+          value: postgres
         ports:
           - name: http-port
             containerPort: 8000
