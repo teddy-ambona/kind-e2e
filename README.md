@@ -19,21 +19,49 @@
 - [14 - Tools that make your life easier](#14---tools-that-make-your-life-easier)
 - [15 - Useful resources](#15---useful-resources)
 
-Demo project with Kubernetes IN Docker local cluster
+Demo project powered by a k8s in Docker local cluster that hosts a distributed web app. Here is the tech stack that I have implemented:
+
+- Service Mesh (Istio, Kiali)
+- Observability: Performance metrics and logs monitoring (Grafana, Prometheus)
+- Package manager (Helm charts)
+- API Instrumentation (Open-Telemetry, Jaeger)
+- Front-end: NodeJS (Express web framework)
+- Business-logic: Python (Django web-framework)
+- Self-contained CICD pipeline for testing purposes (Jenkins on k8s). The CICD pipeline does:
+  - Build Docker images
+  - Deploys codebase with Helm
 
 **IMPORTANT: This guide is intended for development, and not for a production deployment.**
 
 ## 1 - Target setup
 
+local machine (kubectl, istioctl, helm, web browser) --> kind cluster:
 - Local registry
-- 3 master nodes
+- 3 master nodes (no need to specify what's in it)
 - 3 worker nodes
-- jenkins:  1 master 3 slavess
+- Deployments:
+  - front-end
+  - business-logic
+  - istiod
+  - grafana
+  - jaeger
+  - prometheus
+  - Kiali
+  - Ingress gateway
+  - jenkins:  1 master 3 slavess
+- istio proxies within pods?
+
+Website landing page (accessible at http://localhost:8080/demo-app/)
+
+<img src="./docs/img/website_landing_page.png" width="850"/>
+
+This website has only 2 interactive buttons "Slow page" and "Fast page" that are used to generate traffic into the k8s cluster.
 
 ## 2 - Prerequisites
 
 - [Docker](https://docs.docker.com/get-docker/)(8.0 GB of memory and 4 CPUs)
 - [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
+- [Helm](https://helm.sh/docs/intro/install/)(v3)
 - [istioctl](https://istio.io/latest/docs/setup/getting-started/#download)(v1.16.1 has been used for this demo)
 
 ## 3 - Quickstart
@@ -42,12 +70,6 @@ Create k8s cluster (each node is a Docker container) and local Docker registry.
 
 ```bash
 ./create-cluster.sh
-```
-
-In order to SSH into a node, we run:
-
-```bash
-docker exec -it <node-name> bash
 ```
 
 Run these commands to access:
@@ -113,7 +135,7 @@ Note that the default sampling rate is 1%, which means that 99% of the traces wo
 
 By default Istio provides service-to-service tracing without context propagation, so if service A calls B which calls C, you will get two traces A -> B and B -> C. For this demo we want something more practical such as instrumenting our application code rather than simply observing services. For this we make use of OpenTelemetry (OTel) which is the [recommended instrumentation SDK](https://www.jaegertracing.io/docs/1.40/getting-started/#instrumentation). The OTel SDK implemented within our Django and NodeJS web-apps will allow us to create custom spans.
 
-### A - Meet Jaeger UI
+### A - Meet Jaeger
 
 Jaeger is a distributed tracing system released as open source by Uber Technologies. It is used for monitoring and troubleshooting microservices-based distributed systems, including:
 
@@ -127,7 +149,9 @@ You can find details about how Jaeger works in the official [documentation](http
 
 A high-level diagram of how instrumentation has been instrumented in this demo is provided below:
 
-<img src="./docs/diagrams/jaeger.drawio.png" width="500"/>
+<img src="./docs/diagrams/jaeger.drawio.png" width="650"/>
+
+*Trace collection overview*
 
 Note that the jaeger/all-in-one container is deployed through the [Istio add-on](https://istio.io/latest/docs/ops/integrations/jaeger/#installation). In case you are wondering why do we use a Zipkin exporter if we have a Jaeger backend, Jaeger backend has a [Zipkin compatible endpoint](https://www.jaegertracing.io/docs/1.40/getting-started/#all-in-one) listening on port 9411. We can then use `http://zipkin.istio-system.svc.cluster.local:9411/api/v2/spans` to send our spans to the Jaeger collector.
 
@@ -147,7 +171,7 @@ The B3 headers have been injected by OTel.
 
 ### C - So what do traces look like?
 
-Select the trace you want to inspect. let's select the slow page endpoint:
+Select the trace you want to inspect. Let's select the slow page endpoint:
 
 <img src="./docs/img/jaeger_ui.png" width="850"/>
 
@@ -180,6 +204,12 @@ Restart pods (after config change for example):
 
 ```bash
 kubectl rollout restart deployment <deployment_name> -n <namespace>
+```
+
+In order to SSH into a kind node, we must run:
+
+```bash
+docker exec -it <node-name> bash
 ```
 
 ## 14 - Tools that make your life easier

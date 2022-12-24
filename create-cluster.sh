@@ -32,17 +32,36 @@ data:
     help: "https://kind.sigs.k8s.io/docs/user/local-registry/"
 EOF
 
-# Install Istio
-istioctl install --set profile=demo -y
+# Configure the Helm repository for Istio
+helm repo add istio https://istio-release.storage.googleapis.com/charts
+helm repo update
+
+# Install the Istio base chart which contains cluster-wide resources used by the Istio control plane
+# istioctl install --set profile=demo -y
+helm install --create-namespace -n istio-system istio-base istio/base
+
+# Install the Istio discovery chart which deploys the istiod service
+helm install istiod istio/istiod -n istio-system --wait --set meshConfig.enableTracing=true
+
+# Install an ingress gateway
+kubectl create namespace istio-ingress
+kubectl label namespace istio-ingress istio-injection=enabled
+helm install istio-ingress istio/gateway -n istio-ingress
+
+# Verify status of Istio installation
+helm status istiod -n istio-system
 
 # Add a namespace label to instruct Istio to automatically inject Envoy sidecar proxies
 # when you deploy your application later:
 kubectl label namespace default istio-injection=enabled
 
-kubectl apply -f helm/business-logic-deployment.yaml
-kubectl apply -f helm/business-logic-service.yaml
-kubectl apply -f helm/front-end-deployment.yaml
-kubectl apply -f helm/front-end-service.yaml
+# Deploy helm charts
+helm install --generate-name ./helm
+
+# kubectl apply -f helm/business-logic-deployment.yaml
+# kubectl apply -f helm/business-logic-service.yaml
+# kubectl apply -f helm/front-end-deployment.yaml
+# kubectl apply -f helm/front-end-service.yaml
 
 # Setup kind dashboard
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
@@ -57,9 +76,6 @@ token=$(kubectl -n kubernetes-dashboard create token admin-user)
 # Display the token using the echo command and copy it to use for logging into Dashboard.
 echo $token
 
-# Associate this application with the Istio gateway:
-kubectl apply -f helm/app_gateway.yaml
-
 # Install add-ons. cf https://istio.io/latest/docs/ops/integrations/
 # Grafana
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.16/samples/addons/grafana.yaml
@@ -73,7 +89,8 @@ kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.16/samp
 # Kiali
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.16/samples/addons/kiali.yaml
 
-# Setup default tracing config
-istioctl install -f helm/tracing.yaml -y
+# # Setup default tracing config
+# istioctl install -f helm/tracing.yaml -y
 
 # kubectl port-forward service/istio-ingressgateway 8080:http2 -n istio-system
+kubectl port-forward gateways/demo-app-gateway 8080:http
