@@ -2,11 +2,9 @@ apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:
   name: demo-app-gateway
-  namespace: istio-ingress
 spec:
   selector:
-    istio: ingress # use istio default controller
-    app: istio-ingress
+    istio: ingressgateway # use istio default controller
   servers:
   - port:
       number: 80
@@ -23,7 +21,7 @@ spec:
   hosts:
   - "*"
   gateways:
-  - istio-ingress/demo-app-gateway
+  - demo-app-gateway
   http:
   - match:
     - uri:
@@ -32,6 +30,6 @@ spec:
       uri: "/"
     route:
     - destination:
-        host: front-end-service
+        host: front-end
         port:
           number: 8080

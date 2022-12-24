@@ -12,7 +12,7 @@ image:
 
 imagePullSecrets: []
 nameOverride: ""
-fullnameOverride: ""
+fullnameOverride: "front-end"
 
 podAnnotations: {}
 
@@ -28,7 +28,6 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  name: front-end-service
   type: ClusterIP
   port: 8080
 
@@ -65,5 +64,5 @@ affinity: {}
 env:
   PORT: 8080
   HOST: 0.0.0.0
-  BL_HOST: http://business-logic:8080
+  BL_HOST: http://business-logic:8000
   ZIPKIN_URL: http://zipkin.istio-system.svc.cluster.local:9411/api/v2/spans

@@ -48,9 +48,14 @@ why do we use microk8s vs minikube: https://www.itprotoday.com/cloud-computing-a
     > time bound
     > object bound
  
+ > Add readiness and liveness probes in Django app
+ > explain how istio ingress works
  > Add helm commands in Useful commands
    # test the template rendering, but not actually install anything
    $ helm install --debug --dry-run --generate-name ./mychart
+
+   # To deploy a new revision of the app
+   $ helm upgrade kind-e2e ./helm
  > Add auto-doc for Helm?
  > Explain Helm: Package manager, templating, release management.
  > in practice business-logic/front-end/helm/jenkins should have their own repositories.
