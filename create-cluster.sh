@@ -93,4 +93,4 @@ kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.16/samp
 # istioctl install -f helm/tracing.yaml -y
 
 # kubectl port-forward service/istio-ingressgateway 8080:http2 -n istio-system
-kubectl port-forward gateways/demo-app-gateway 8080:http
+# kubectl port-forward service/istio-ingress 8080:http2 -n istio-ingress
