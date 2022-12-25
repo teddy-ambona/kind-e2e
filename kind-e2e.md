@@ -50,12 +50,6 @@ why do we use microk8s vs minikube: https://www.itprotoday.com/cloud-computing-a
  
  > Add readiness and liveness probes in Django app
  > explain how istio ingress works
- > Add helm commands in Useful commands
-   # test the template rendering, but not actually install anything
-   $ helm install --debug --dry-run --generate-name ./mychart
-
-   # To deploy a new revision of the app
-   $ helm upgrade kind-e2e ./helm
  > Add auto-doc for Helm?
  > Explain Helm: Package manager, templating, release management.
  > in practice business-logic/front-end/helm/jenkins should have their own repositories.
@@ -65,7 +59,6 @@ why do we use microk8s vs minikube: https://www.itprotoday.com/cloud-computing-a
  > use persistent volume and pvc? should add a note saying that for production use we shouldn't save data on the node itself.
     > or storage class? overkill for this demo
  > show IP tables and explain how kube-proxy works
- > Istio gateway
  > We are installing Istio with the demo profile for testing purpose https://istio.io/latest/docs/setup/additional-setup/config-profiles/
  > how to access dashboard UI https://istio.io/latest/docs/setup/platform-setup/kind/#setup-dashboard-ui-for-kind
  > run `istioctl analyze` to check any issue with the configuration
@@ -96,9 +89,9 @@ TODO:
    > need to render page based on port used for front-end
 
 > Use helm
-   > install istio as a dependency in main helm chart
-   > use test hook
-
+   > SKIP: install istio as a dependency in main helm chart?
+      > Ingress issues, the ingress pod isn't exposing port 80 or 8080, why? service is pointing at http2 80 though
+   
 > prometheus /grafana
    > 1 dashboard with:
       > Pod CPU/Memory usage

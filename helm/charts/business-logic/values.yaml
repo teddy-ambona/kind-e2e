@@ -28,7 +28,6 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  name: business-logic-service
   type: ClusterIP
   port: 8000
 

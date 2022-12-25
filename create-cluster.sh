@@ -39,25 +39,16 @@ istioctl install --set profile=demo -f tracing.yaml -y
 # when you deploy your application later:
 kubectl label namespace default istio-injection=enabled
 
-# Deploy helm charts
-helm install kind-e2e ./helm
-
-# Setup kind dashboard
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
-
-# Create a ServiceAccount and ClusterRoleBinding to provide admin access to the newly created cluster
-kubectl create serviceaccount -n kubernetes-dashboard admin-user
-kubectl create clusterrolebinding -n kubernetes-dashboard admin-user --clusterrole cluster-admin --serviceaccount=kubernetes-dashboard:admin-user
-
-# To login to Dashboard, you need a Bearer Token. Use the following command to store the token in a variable.
-token=$(kubectl -n kubernetes-dashboard create token admin-user)
-
-# Display the token using the echo command and copy it to use for logging into Dashboard.
-echo $token
-
 # Install add-ons. cf https://istio.io/latest/docs/ops/integrations/
 # Grafana
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.16/samples/addons/grafana.yaml
+
+# Update root url to make app accessible through Virtual Service and port forwarding
+# https://stackoverflow.com/questions/67187642/how-to-use-virtualservice-to-expose-dashboards-like-grafana-prometheus-and-kiali
+kubectl set env deployment grafana -n istio-system \
+GF_SERVER_ROOT_URL='http://localhost:3000/grafana/' \
+GF_SERVER_DOMAIN=localhost \
+GF_SERVER_SERVE_FROM_SUB_PATH='true'
 
 # Prometheus
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.16/samples/addons/prometheus.yaml
@@ -67,8 +58,5 @@ kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.16/samp
 
 # Kiali
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.16/samples/addons/kiali.yaml
-
-# Setup default tracing config
-# istioctl install -f helm/tracing.yaml -y
 
 # kubectl port-forward service/istio-ingressgateway 8080:http2 -n istio-system

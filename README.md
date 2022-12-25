@@ -66,23 +66,56 @@ This website has only 2 interactive buttons "Slow page" and "Fast page" that are
 
 ## 3 - Quickstart
 
-Create k8s cluster (each node is a Docker container) and local Docker registry.
+Run this to:
+
+- Create k8s cluster (each node is a Docker container)
+- Install Istio and its add-ons (Jaeger, Grafana, Prometheus, Kiali)
+- Install 
+- Create and expose a local Docker registry on localhost:5001
 
 ```bash
-./create-cluster.sh
+make create-cluster
 ```
 
-Run these commands to access:
+You can then deploy the app with:
+
+```bash
+make helm-install
+```
+
+In order to reach the cluster from your host you need to use port-forwarding:
+
+```bash
+make port-forward
+```
+
+You can now access the folowwing services:
 
 - Website: [http:localhost:8080/demo-app/](http:localhost:8080/demo-app/)
-- Grafana: `istioctl dashboard grafana`
-- Jaeger: `istioctl dashboard jaeger`
-- Kiali: `istioctl dashboard kiali`
+- Grafana: [http:localhost:8080/grafana](http:localhost:8080/grafana)
+- Jaeger: [http:localhost:8080/jaeger](http:localhost:8080/jaeger)
+- Kiali: [http:localhost:8080/kiali](http:localhost:8080/kiali)
 
 ## 4 - Project file structure
 
 ```text
 .
+├── business-logic/
+├── docs/
+├── front-end/
+├── helm/
+├── jenkins/
+├── .dockerignore
+├── .gitignore
+├── create-cluster.sh
+├── kind-cluster-config.yaml
+├── Makefile
+├── README.md
+```
+
+[business-logic/](./business-logic):
+
+```text
 ├── business-logic/
 │   ├── django_project/
 │   │   └── ...
@@ -92,8 +125,11 @@ Run these commands to access:
 │   ├── manage.py
 │   ├── pyproject.toml
 │   └── requirements.txt
-├── docs/
-│   └── ...
+```
+
+[front-end/](./front-end):
+
+```text
 ├── front-end/
 │   ├── public_html/
 │   │   ├── assets/
@@ -105,21 +141,19 @@ Run these commands to access:
 │   ├── package.json
 │   ├── server.js
 │   └── tracing.js
-├── helm/
-├── jenkins/
-├── .dockerignore
-├── .gitignore
-├── create-cluster.sh
-├── kind-cluster-config.yaml
-├── Makefile
-├── README.md
 ```
+
+in [helm](./helm):
 
 ## 5 - Istio as a service Mesh
 
 ## 6 - Accessing the cluster
 
 There are several ways to access the cluster from external. On Linux you can simply access the cluster using http://<LOAD-BALANCER-EXTERNAL-IP>:8080/demo-app. If you are on Windows you can use [Metallb](https://kind.sigs.k8s.io/docs/user/loadbalancer/) (baremetal loadbalancer project for kubernetes) that implements a k8s LoadBalancer without necessarily being in a hosted cloud. This works if you are on Windows but if you are running docker on MacOS like me you probably have noticed that Docker MacOS has some networking “deficiencies” and these can be overcome by installing a networking shim as explained in [this tutorial](https://www.thehumblelab.com/kind-and-metallb-on-mac/). However in this demo I used [port forwarding](https://kubernetes.io/docs/tasks/access-application-cluster/port-forward-access-application-cluster/) which is a safer way to access the application (for testing purpose) in the cluster, and this will work of any platform :smiley:. You can then access the app using http://localhost:8080/demo-app/.
+
+### Istio Gateway
+
+The configuration is defined in [gateway.yaml]().
 
 ### Add workflow diagram with Kiali
 
@@ -210,6 +244,12 @@ In order to SSH into a kind node, we must run:
 
 ```bash
 docker exec -it <node-name> bash
+```
+
+Test the template rendering, but without actually installing anything:
+
+```bash
+helm install --debug --dry-run --generate-name ./mychart
 ```
 
 ## 14 - Tools that make your life easier
