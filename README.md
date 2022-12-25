@@ -70,14 +70,13 @@ Run this to:
 
 - Create k8s cluster (each node is a Docker container)
 - Install Istio and its add-ons (Jaeger, Grafana, Prometheus, Kiali)
-- Install 
 - Create and expose a local Docker registry on localhost:5001
 
 ```bash
 make create-cluster
 ```
 
-You can then deploy the app with:
+You can then deploy the app and setup the Istio Gateway with:
 
 ```bash
 make helm-install
@@ -130,22 +129,56 @@ You can now access the folowwing services:
 [front-end/](./front-end):
 
 ```text
-├── front-end/
-│   ├── public_html/
-│   │   ├── assets/
-│   │   │   └── ...
-│   │   └── index.html
-│   ├── Dockerfile
-│   ├── LICENSE.txt
-│   ├── package-lock.json
-│   ├── package.json
-│   ├── server.js
-│   └── tracing.js
+└── front-end/
+    ├── public_html/
+    │   ├── assets/
+    │   │   └── ...
+    │   └── index.html
+    ├── Dockerfile
+    ├── LICENSE.txt
+    ├── package-lock.json
+    ├── package.json
+    ├── server.js
+    └── tracing.js
 ```
 
 in [helm](./helm):
 
+```text
+└── helm/
+    ├── charts/
+    │   ├── business-logic/
+    │   │   ├── templates
+    │   │   │   ├── _helpers.tpl
+    │   │   │   ├── deployment.yaml
+    │   │   │   └── service.yaml 
+    │   │   ├── Charts.yaml
+    │   │   └── values.yaml
+    │   └── front-end/
+    │       ├── templates
+    │       │   ├── _helpers.tpl
+    │       │   ├── deployment.yaml
+    │       │   └── service.yaml 
+    │       ├── Charts.yaml
+    │       └── values.yaml
+    ├── templates
+    │   └── gateway.yaml
+    ├── .helmignore
+    ├── Charts.yaml
+    └── values.yaml
+```
+
 ## 5 - Istio as a service Mesh
+
+A [service mesh](https://istio.io/latest/about/service-mesh/) is a dedicated infrastructure layer that you can add to your applications. It allows you to transparently add capabilities like observability, traffic management, and security, without adding them to your own code.
+
+<img src="./docs/diagrams/istio_architecture.png" width="650"/>
+
+*source: [Istio Architecture](https://istio.io/latest/docs/ops/deployment/architecture/)*
+
+### Istiod
+
+### Envoy
 
 ## 6 - Accessing the cluster
 
@@ -153,7 +186,19 @@ There are several ways to access the cluster from external. On Linux you can sim
 
 ### Istio Gateway
 
-The configuration is defined in [gateway.yaml]().
+As mentioned above you can go to http://localhost:8080/demo-app/ to access the app, that is made possible thanks to Istio Gateway (the configuration is defined in [gateway.yaml](./helm/templates/gateway.yaml)). A diagram showing how this resources are connected is shown here (cf [article](https://www.alibabacloud.com/blog/north-south-traffic-management-of-istio-gateways-with-answers-from-service-mesh-experts_596658):
+
+<img src="./docs/diagrams/istio_gateway.png" width="650"/>
+
+*source: [North-South Traffic Management of Istio Gateways](https://www.alibabacloud.com/blog/north-south-traffic-management-of-istio-gateways-with-answers-from-service-mesh-experts_596658)*
+
+1) The client sends a request on a specific port.
+2) The Server Load Balancer (SLB) listens to this port and forwards the request to the cluster (on the same port or another port).
+3) Within the cluster, the request is routed to the port forwarded by the SLB which was listened to by the Istio IngressGateway service.
+4) The Istio IngressGateway service forwards the request (on the same port or another port) to the corresponding pod.
+5) Gateway resources and VirtualService resources are configured on the IngressGateway pod. The port, protocol, and related security certificates are configured on the Gateway. The VirtualService routing information is used to find the correct service.
+6) The Istio IngressGateway pod routes the request to the corresponding application service based on the routing information.
+7) The application service routes the request to the corresponding application pod.
 
 ### Add workflow diagram with Kiali
 
