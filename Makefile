@@ -8,15 +8,21 @@ LOCAL_REGISTRY = localhost:5001
 create-cluster:
 	./create-cluster.sh
 
-# Deploy helm charts
+# Install helm charts or add a new revision to the kind-e2e release if it already exists
 .PHONY: helm-install
-helm-install:
-	helm install kind-e2e ./helm
+helm-app:
+	helm upgrade --install app ./helm
 
-# Add a new revision to the kind-e2e release
-.PHONY: helm-upgrade
-helm-upgrade:
-	helm upgrade kind-e2e ./helm
+# Deploy loki charts
+.PHONY: helm-loki
+helm-loki:
+	helm repo add grafana https://grafana.github.io/helm-charts
+	helm repo update
+
+	# Build out the charts/ directory from the Chart.lock file.
+	helm dependency build ./loki
+
+	helm upgrade --install loki-stack --namespace istio-system ./loki
 
 # Forward port 8080 on local host to ingress service
 .PHONY: port-forward

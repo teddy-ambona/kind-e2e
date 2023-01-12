@@ -57,12 +57,20 @@ Website landing page (accessible at http://localhost:8080/demo-app/)
 
 This website has only 2 interactive buttons "Slow page" and "Fast page" that are used to generate traffic into the k8s cluster.
 
+> If you see "no healthy upstream" while trying to access the web-app, wait for a couple of seconds until the app is up and running and that should work.
+
+In my other demo [financial-data-api](https://github.com/teddy-ambona/financial-data-api) I focused on "Plan > Code > Build > Test > Release > Deploy", now kind-e2e is targeting the "Operate > Monitor" part of the SDLC.
+
+<img src="./docs/diagrams/devops.png" width="400"/>
+
+*source: [What is DevOps?](https://www.dynatrace.com/news/blog/what-is-devops/)*
+
 ## 2 - Prerequisites
 
-- [Docker](https://docs.docker.com/get-docker/)(8.0 GB of memory and 4 CPUs)
+- [Docker](https://docs.docker.com/get-docker/) (8.0 GB of memory and 4 CPUs)
 - [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
-- [Helm](https://helm.sh/docs/intro/install/)(v3)
-- [istioctl](https://istio.io/latest/docs/setup/getting-started/#download)(v1.16.1 has been used for this demo)
+- [Helm](https://helm.sh/docs/intro/install/) (v3)
+- [istioctl](https://istio.io/latest/docs/setup/getting-started/#download) (v1.16.1 has been used for this demo)
 
 ## 3 - Quickstart
 
@@ -112,7 +120,9 @@ You can now access the folowwing services:
 ├── README.md
 ```
 
-[business-logic/](./business-logic):
+Since this demo repo should be self-contained we put cluster configuration, app code and CICD definition in the same place but in practice `business-logic`, `front-end`, `helm` and `jenkins` should have their own repositories
+
+in [business-logic/](./business-logic)
 
 ```text
 ├── business-logic/
@@ -126,7 +136,7 @@ You can now access the folowwing services:
 │   └── requirements.txt
 ```
 
-[front-end/](./front-end):
+in [front-end/](./front-end)
 
 ```text
 └── front-end/
@@ -142,7 +152,7 @@ You can now access the folowwing services:
     └── tracing.js
 ```
 
-in [helm](./helm):
+in [helm](./helm)
 
 ```text
 └── helm/
@@ -248,7 +258,7 @@ Here is a snapshot of what the front-end sends to the business-logic backend:
 
 The B3 headers have been injected by OTel.
 
-### C - So what do traces look like?
+### C - So what do traces look like in Jaeger UI?
 
 Select the trace you want to inspect. Let's select the slow page endpoint:
 
@@ -259,6 +269,31 @@ Latencies can be identified in the Gant diagram. Requests originate from the Ing
 <img src="./docs/img/slow_page_trace.png" width="850"/>
 
 ## 8 - Grafana dashboard
+
+Grafana is a multi-platform open source analytics and interactive visualization web application. It provides charts, graphs, and alerts for the web when connected to supported data sources.
+
+In the previous section we were able to analyze a trace, which is nice, but generally in order to troubleshoot an issue we need to see the corresponding logs and pod metrics. In this section we will see how to correlate the traces with the logs and metrics using Grafana.
+
+### Loki stack
+
+Loki is a horizontally scalable, highly available, multi-tenant log aggregation system inspired by Prometheus.
+see [Log Monitoring and Alerting with Grafana Loki](https://www.infracloud.io/blogs/grafana-loki-log-monitoring-alerting/) for a more detailed explanation.
+
+In short, the Promtail daemonset deploys pods that are scraping the logs from our Docker containers and shipping them to the Loki DB (they aren't persisted for this demo although you should persist logs in a production environment). Promtail also gives you the ability to filter and transform the logs along the way if need be.
+
+Grafana's data sources, namely Jaeger and Loki are defined in [grafana_data_sources.yaml]() and there are some tweaks to be made to correlate logs, traces and metrics.
+
+### B - Configure Loki Derived Field to extract Trace ID from the logs
+
+The [Derived Fields configuration]() helps you add fields parsed from the log message and add a link that uses the value of the field. In our case we want to extract the Trace ID from the log message. This is necessary if you want to get this "Jaeger" button showing up in your logs.
+
+<img src="./docs/img/logs_to_trace.png" width="850"/>
+
+### C - Configure trace to logs
+
+For the traces to be correlated to logs we need to match the [service.name]() trace tag with the pod tag `app`, this is done in the [Jaeger data source definiton]()
+
+<img src="./docs/img/trace_to_logs.png" width="850"/>
 
 ## 9 - Kiali
 
@@ -303,9 +338,12 @@ helm install --debug --dry-run --generate-name ./mychart
 
 <img src="./docs/img/k9s.png" width="850"/>
 
+[popeye](https://github.com/derailed/popeye): Scans live Kubernetes cluster and reports potential issues with deployed resources and configurations
+
+<img src="./docs/img/popeye.png" width="850"/>
+
 ## 15 - Useful resources
 
 - [Certified Kubernetes Administrator (CKA) Course Notes](https://github.com/kodekloudhub/certified-kubernetes-administrator-course)
-- [kind Official Documentation](https://kind.sigs.k8s.io/)
-- [popeye](https://github.com/derailed/popeye)
-- [webhook.site](https://webhook.site): to inspect what your HTTP requests look like from a receiver perpective, very useful when you play with API instrumentation
+- [kind official documentation](https://kind.sigs.k8s.io/)
+- [webhook.site](https://webhook.site): Inspect what your HTTP requests look like from a receiver perpective, very useful when you play with API instrumentation

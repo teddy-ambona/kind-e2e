@@ -1,0 +1,48 @@
+apiVersion: 1
+
+datasources:
+  - uid: loki
+    orgId: 1
+    name: Loki
+    type: loki
+    typeName: Loki
+    access: proxy
+    url: http://loki-stack:3100
+    password: ''
+    user: ''
+    database: ''
+    basicAuth: false
+    isDefault: false
+    jsonData:
+      # cf https://grafana.com/docs/grafana/latest/datasources/loki/#configure-derived-fields
+      derivedFields:
+        # example log message:
+        # 2023-01-12 11:08:57,516 INFO [pages.views] [views.py:47] [trace_id=0a75f8c5005afeb273ed1b59c5b7714d span_id=9e7a13010adc8a80 resource.service.name=django-app] - Calling the slow function 'data_transformation'
+        - datasourceUid: jaeger
+          matcherRegex: (?:trace_id)=(\w+)
+          name: TraceID
+          url: $${__value.raw}
+    readOnly: false
+    editable: true
+  - uid: jaeger
+    name: Jaeger
+    type: jaeger
+    typeName: Jaeger
+    access: proxy
+    url: http://tracing/jaeger
+    user: ''
+    database: ''
+    basicAuth: false
+    isDefault: false
+    jsonData:
+      nodeGraph:
+        enabled: true
+      tracesToLogs:
+        datasourceUid: loki
+        filterBySpanID: false
+        filterByTraceID: true
+        mapTagNamesEnabled: true
+        mappedTags:
+          - key: service.name
+            value: app
+    readOnly: false
