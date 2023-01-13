@@ -46,6 +46,7 @@ why do we use microk8s vs minikube: https://www.itprotoday.com/cloud-computing-a
     > time bound
     > object bound
  
+ > Loki is using LogQL --> https://grafana.com/docs/loki/latest/logql/
  > Add readiness and liveness probes in Django app
  > Add auto-doc for Helm?
  > Explain Helm: Package manager, templating, release management.
@@ -64,11 +65,7 @@ TODO:
 > deploy front-end (CSS and Node.Js):
    > need to render page based on port used for front-end
 
-> Need to install grafana after Loki and Jaeger so that data sources are valid
-      > Loki is using LogQL --> https://grafana.com/docs/loki/latest/logql/
-> Grafana data sources are defined in datasources.yaml in the configmap:
-   > k8s how to append to file from configmap?
-   > do we need to restart Grafana to pick up new config? Grafana API should allow doing that?
+> Add metrics correlation to logs and traces
 
 > Jenkins
    > need to mount volume so that Jenkins has access to local files

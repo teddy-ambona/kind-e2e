@@ -77,17 +77,23 @@ In my other demo [financial-data-api](https://github.com/teddy-ambona/financial-
 Run this to:
 
 - Create k8s cluster (each node is a Docker container)
-- Install Istio and its add-ons (Jaeger, Grafana, Prometheus, Kiali)
+- Install Istio and its add-ons (Jaeger, Grafana, Prometheus, Kiali, Loki-stack)
 - Create and expose a local Docker registry on localhost:5001
 
 ```bash
 make create-cluster
 ```
 
+Then build the Docker images and push them to the local Docker repository
+
+```bash
+make build-business-logic build-front-end push
+```
+
 You can then deploy the app and setup the Istio Gateway with:
 
 ```bash
-make helm-install
+make helm-app
 ```
 
 In order to reach the cluster from your host you need to use port-forwarding:

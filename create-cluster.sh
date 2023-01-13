@@ -41,7 +41,7 @@ kubectl label namespace default istio-injection=enabled
 
 # Install add-ons. cf https://istio.io/latest/docs/ops/integrations/
 # Grafana
-kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.16/samples/addons/grafana.yaml
+kubectl apply -f grafana.yaml
 
 # Update root url to make app accessible through Virtual Service and port forwarding
 # https://stackoverflow.com/questions/67187642/how-to-use-virtualservice-to-expose-dashboards-like-grafana-prometheus-and-kiali
@@ -58,5 +58,8 @@ kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.16/samp
 
 # Kiali
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.16/samples/addons/kiali.yaml
+
+# Loki-stack
+make helm-loki
 
 # kubectl port-forward service/istio-ingressgateway 8080:http2 -n istio-system

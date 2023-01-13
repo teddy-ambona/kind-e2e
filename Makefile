@@ -9,7 +9,7 @@ create-cluster:
 	./create-cluster.sh
 
 # Install helm charts or add a new revision to the kind-e2e release if it already exists
-.PHONY: helm-install
+.PHONY: helm-app
 helm-app:
 	helm upgrade --install app ./helm
 
