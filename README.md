@@ -299,7 +299,29 @@ The [Derived Fields configuration]() helps you add fields parsed from the log me
 
 For the traces to be correlated to logs we need to match the [service.name]() trace tag with the pod tag `app`, this is done in the [Jaeger data source definiton]()
 
+Also, the [opentelemetry-instrumentation-logging](https://github.com/open-telemetry/opentelemetry-python-contrib/tree/main/instrumentation/opentelemetry-instrumentation-logging) python library needs to be implemented, it is a wrapper for the logging library that will output your logs in the format:
+
+```python
+%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] [trace_id=%(otelTraceID)s span_id=%(otelSpanID)s resource.service.name=%(otelServiceName)s] - %(message)s
+```
+
+This is essential as the span and trace IDs have to be included in the log message for Grafana to correlate the logs. Here is the [link to the documentation](https://opentelemetry-python-contrib.readthedocs.io/en/latest/instrumentation/logging/logging.html).
+
+Now that Grafana knows how to correlate the logs with its corresponding span or trace let's check what that looks like in the UI :grinning:
+
 <img src="./docs/img/trace_to_logs.png" width="850"/>
+
+### D - Metrics
+
+Prometheus is an open-source tool for collecting metrics and sending alerts. It has been implemented using the python package [django-prometheus](https://github.com/korfuri/django-prometheus), now if you ssh onto the front-end container and do `curl http://business-logic:8000/metrics` you will see a whole bunch of application metrics (see below):
+
+<img src="./docs/img/prometheus_metrics.png" width="850"/>
+
+#### Introducing exemplars
+
+An exemplar is a specific trace representative of measurement taken in a given time interval. While metrics excel at giving you an aggregated view of your system, traces give you a fine grained view of a single request; exemplars are a way to link the two ([more details on that here](https://grafana.com/docs/grafana/latest/fundamentals/exemplars/)).
+
+Note that you can play around with prometheus metrics using [this self-contained sample code](https://github.com/prometheus/client_python/blob/1fd0ded5f8c9e7101471ea06198d88427728ff50/README.md#three-step-demo) if you need to debug some code.
 
 ## 9 - Kiali
 
@@ -353,3 +375,5 @@ helm install --debug --dry-run --generate-name ./mychart
 - [Certified Kubernetes Administrator (CKA) Course Notes](https://github.com/kodekloudhub/certified-kubernetes-administrator-course)
 - [kind official documentation](https://kind.sigs.k8s.io/)
 - [webhook.site](https://webhook.site): Inspect what your HTTP requests look like from a receiver perpective, very useful when you play with API instrumentation
+- [Grafana dashboard best practices](https://grafana.com/docs/grafana/latest/dashboards/build-dashboards/best-practices/)
+- [Prometheus Documentation](https://prometheus.io/docs/introduction/overview/)

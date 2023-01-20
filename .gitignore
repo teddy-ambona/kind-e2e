@@ -169,3 +169,5 @@ npm-debug.log
 
 # File that contains secret variables
 secrets.txt
+
+.DS_Store

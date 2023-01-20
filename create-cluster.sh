@@ -51,7 +51,7 @@ GF_SERVER_DOMAIN=localhost \
 GF_SERVER_SERVE_FROM_SUB_PATH='true'
 
 # Prometheus
-kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.16/samples/addons/prometheus.yaml
+kubectl apply -f prometheus.yaml
 
 # Jaeger
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.16/samples/addons/jaeger.yaml

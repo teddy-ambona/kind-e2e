@@ -7,6 +7,7 @@ name = "django-app"
 version = "1"
 dependencies = [
     "django",
+    "django-prometheus",
     "opentelemetry-sdk",
     "opentelemetry-instrumentation-django",
     "opentelemetry-propagator-b3",
