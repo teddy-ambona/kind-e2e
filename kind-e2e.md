@@ -65,37 +65,17 @@ TODO:
 > deploy front-end (CSS and Node.Js):
    > need to render page based on port used for front-end
 
-> Add metrics correlation to logs and traces
-
--------------
-> Need to update prometheus to point at django-app endpoint
-   > why django app not appearing in grafana?
-   > how to see prometheus dashboard through istio?
-   > maybe destroy/recreate cluster first?
-
-
 Need to configure exemplars in prometheus data source:
 https://vbehar.medium.com/using-prometheus-exemplars-to-jump-from-metrics-to-traces-in-grafana-249e721d4192
    > how to add trace ID exemplar in django-prometheus metrics?
    > example overwritting all metrics here: https://github.com/marcel-dempers/docker-development-youtube-series/blob/master/monitoring/prometheus/python-application/src/server.py
    > explanation on each metric type here: https://linuxhint.com/monitor-python-applications-prometheus/
    > "You can only have one exemplar per metric, this means when another request fits into that bucket, then the values will be overwritten."
-   > Run django using local python while Docker not working (slow internet)
-
-> Prometheus has 4 metric types: https://prometheus.io/docs/concepts/metric_types/
-   - histogram
-   - counter
-   - gauge
-   - summary
 
 Other tutorial
 https://grafana.com/blog/2020/11/09/trace-discovery-in-grafana-tempo-using-prometheus-exemplars-loki-2.0-queries-and-more/
 
 Only need metrics to trace (exemplars) and metrics to logs
-
-Dashboard with 500s and duration> SLA?
-   > Then metrics to trace
-   > maybe reuse this dashboard? https://grafana.com/grafana/dashboards/9528-django-prometheus/
 ----------------
 
 > Jenkins

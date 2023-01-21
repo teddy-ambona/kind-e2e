@@ -1,3 +1,4 @@
+# We create 1 Gateway and 1 Virtual Service per namespace.
 apiVersion: networking.istio.io/v1alpha3
 kind: Gateway
 metadata:

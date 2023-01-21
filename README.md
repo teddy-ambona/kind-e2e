@@ -21,7 +21,7 @@
 
 Demo project powered by a k8s in Docker local cluster that hosts a distributed web app. Here is the tech stack that I have implemented:
 
-- Service Mesh (Istio, Kiali)
+- Service Mesh (Istio, Kiali, Virtual Service, Gateway)
 - Observability: Performance metrics and logs monitoring (Grafana, Prometheus)
 - Package manager (Helm charts)
 - API Instrumentation (Open-Telemetry, Jaeger)
@@ -313,9 +313,37 @@ Now that Grafana knows how to correlate the logs with its corresponding span or 
 
 ### D - Metrics
 
-Prometheus is an open-source tool for collecting metrics and sending alerts. It has been implemented using the python package [django-prometheus](https://github.com/korfuri/django-prometheus), now if you ssh onto the front-end container and do `curl http://business-logic:8000/metrics` you will see a whole bunch of application metrics (see below):
+Prometheus is an open-source tool for collecting metrics and sending alerts. It has [4 metric types](https://prometheus.io/docs/concepts/metric_types/):
+- histogram
+- counter
+- gauge
+- summary
+
+Prometheus has been implemented using the python package [django-prometheus](https://github.com/korfuri/django-prometheus), now if you ssh onto the front-end container and do `curl http://business-logic.default.svc:8000/metrics` you will see a whole bunch of application metrics (see below):
 
 <img src="./docs/img/prometheus_metrics.png" width="850"/>
+
+What happened is that the django-prometheus library decorated the endpoints and tracks the status codes (counter) and request duration (gauge). The prometheus server (pod) will .scrape this `http://business-logic.default.svc:8000/metrics` every 5s ([see config]()) and save the result in the time-series database (ie the folder /data on the node, this is not suitable for production). Here is the general architecture of Prometheus:
+
+<img src="./docs/diagrams/prometheus_architecture.png" width="600"/>
+
+*source: [Prometheus documentation](https://prometheus.io/docs/introduction/overview/)*
+
+I have reused the [Django Prometheus dashboard available on Grafana Labs](https://grafana.com/grafana/dashboards/9528-django-prometheus/) as it is quite descriptive and provides the information we need to analyze the traffic coming into our back-end application. The dashboard is configured in [grafana.yaml]() where it is stored in a k8s config map which is itself mounted as a volume in the Grafana pod.
+
+To find the Django Prometheus Grafana dashboard:
+
+<img src="./docs/img/grafana_browse_dashboards.png" width="200"/>
+
+The dashboard looks as follow:
+
+<img src="./docs/img/django_prometheus_dashboard.png" width="850"/>
+
+The values are to be read as "Number of X per second". For example if we look at the PromQL query in the Request chart (top left):
+
+<img src="./docs/img/promql_example.png" width="600"/>
+
+This formula means that we are aggregating the number of requests per HTTP method per Django View (endpoint) using the last 2 data points available over the last 1 minute. More info on the PromQL functions [here](https://prometheus.io/docs/prometheus/latest/querying/functions/).
 
 #### Introducing exemplars
 
