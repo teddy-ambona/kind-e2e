@@ -184,6 +184,10 @@ in [helm](./helm)
     └── values.yaml
 ```
 
+## Helm
+
+Helm is a package manager but also a templating and release management open-soource tool. The font-end and back-end apps are deployed through Helm using the `make helm-app` command. This command will deploy a new revised version of the charts, this is particularly useful when a rollback is needed.
+
 ## 5 - Istio as a service Mesh
 
 A [service mesh](https://istio.io/latest/about/service-mesh/) is a dedicated infrastructure layer that you can add to your applications. It allows you to transparently add capabilities like observability, traffic management, and security, without adding them to your own code.
@@ -194,7 +198,22 @@ A [service mesh](https://istio.io/latest/about/service-mesh/) is a dedicated inf
 
 ### Istiod
 
+Istiod (the ’d’ is for daemon )provides service discovery, configuration and certificate management.
+
+Istiod converts high level routing rules that control traffic behavior into Envoy-specific configurations, and propagates them to the sidecars at runtime (cf [documentation](https://istio.io/latest/docs/ops/deployment/architecture/#istiod))
+
 ### Envoy
+
+Envoy is an L7 proxy and communication bus designed for large modern service-oriented architectures. It is deployed into a Kubernetes cluster using a sidecar pattern, which means that every Istio-enabled application (or namespace, deployment, or pod) gets injected with a container running an Envoy proxy, with the necessary configuration bootstrapped into it. This process is overseen by the control plane (and its Pilot component) and abstracts Envoy’s configuration into a more high-level Istio concept. Usage of the sidecar pattern also eliminates the need to re-architect any existing infrastructure and provides a flexible way of rolling out the service mesh gradually.
+
+Envoy provides many useful features for Istio, which can be grouped into the following rough categories:
+
+- **traffic control and network resiliency:** load balancing, traffic throttling, rate limiting, fault injection, failover, and retry mechanisms
+- **security and authentication:** the policy-enforcement point for authentication policies that define the rules of request and peer authentication
+- **observability:** rich telemetry data for mesh communications, including metrics, traces, and access/audit logging
+- **extensibility:** enables additional Envoy filters, WASM plugins, and allows Istio to be integrated into almost any environment
+
+More info on [Istio & Envoy: How they work together](https://www.kubecost.com/kubernetes-devops-tools/istio-envoy/)
 
 ## 6 - Accessing the cluster
 
@@ -367,6 +386,7 @@ docker kill kind-registry
 
 ## 12 - TODO
 
+- Use [helm-file](https://github.com/helmfile/helmfile) to manage chart releases across several namespaces
 
 ## 13 - Useful commands
 
