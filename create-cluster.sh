@@ -33,7 +33,7 @@ data:
 EOF
 
 # Install Istio and setup default tracing config
-istioctl install --set profile=demo -f tracing.yaml -y
+istioctl install --set profile=demo -f istio-add-ons/tracing.yaml -y
 
 # Add a namespace label to instruct Istio to automatically inject Envoy sidecar proxies
 # when you deploy your application later:
@@ -41,7 +41,7 @@ kubectl label namespace default istio-injection=enabled
 
 # Install add-ons. cf https://istio.io/latest/docs/ops/integrations/
 # Grafana
-kubectl apply -f grafana.yaml
+kubectl apply -f istio-add-ons/grafana.yaml
 
 # Update root url to make app accessible through Virtual Service and port forwarding
 # https://stackoverflow.com/questions/67187642/how-to-use-virtualservice-to-expose-dashboards-like-grafana-prometheus-and-kiali
@@ -51,8 +51,7 @@ GF_SERVER_DOMAIN=localhost \
 GF_SERVER_SERVE_FROM_SUB_PATH='true'
 
 # Prometheus
-kubectl apply -f prometheus.yaml
-
+kubectl apply -f istio-add-ons/prometheus.yaml
 # Jaeger
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.16/samples/addons/jaeger.yaml
 

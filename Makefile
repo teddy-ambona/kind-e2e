@@ -11,7 +11,7 @@ create-cluster:
 # Install helm charts or add a new revision to the kind-e2e release if it already exists
 .PHONY: helm-app
 helm-app:
-	helm upgrade --install app ./helm
+	helm upgrade --install app ./helm/app
 
 # Deploy loki charts
 .PHONY: helm-loki
@@ -20,9 +20,9 @@ helm-loki:
 	helm repo update
 
 	# Build out the charts/ directory from the Chart.lock file.
-	helm dependency build ./loki
+	helm dependency build ./helm/loki
 
-	helm upgrade --install loki-stack --namespace istio-system ./loki
+	helm upgrade --install loki-stack --namespace istio-system ./helm/loki
 
 # Forward port 8080 on local host to ingress service
 .PHONY: port-forward
