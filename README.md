@@ -27,8 +27,7 @@
 - [14 - Tools that make your life easier](#14---tools-that-make-your-life-easier)
 - [15 - Useful resources](#15---useful-resources)
 
-
-Demo project powered by a k8s in Docker local cluster that hosts a distributed web app. Here is the tech stack that I have implemented:
+Demo web app powered by a k8s in Docker local cluster that hosts a distributed web app. Here is the tech stack that I have implemented:
 
 - Service Mesh (Istio, Kiali, Virtual Service, Gateway)
 - Observability: Performance metrics and logs monitoring (Grafana, Prometheus) + correlation between logs/traces/metrics.
@@ -44,7 +43,6 @@ Demo project powered by a k8s in Docker local cluster that hosts a distributed w
 Below is a simplified view of the cluster architecture:
 
 <img src="./docs/diagrams/kind-e2e.drawio.png" width="850"/>
-
 *k8s cluster workflow diagram*
 
 Website landing page (accessible at http://localhost:8080/demo-app/)
