@@ -43,6 +43,7 @@ Demo web app powered by a k8s in Docker local cluster that hosts a distributed w
 Below is a simplified view of the cluster architecture:
 
 <img src="./docs/diagrams/kind-e2e.drawio.png" width="850"/>
+
 *k8s cluster workflow diagram*
 
 Website landing page (accessible at http://localhost:8080/demo-app/)
