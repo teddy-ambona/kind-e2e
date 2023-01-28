@@ -27,14 +27,17 @@
 - [14 - Tools that make your life easier](#14---tools-that-make-your-life-easier)
 - [15 - Useful resources](#15---useful-resources)
 
-Demo web app powered by a k8s in Docker local cluster that hosts a distributed web app. Here is the tech stack that I have implemented:
+Demo distributed web app running on a k8s in Docker local cluster. Its aim is to showcase fast and efficient debugging with the right tooling. Here is the tech stack that I have implemented:
 
 - Service Mesh (Istio, Kiali, Virtual Service, Gateway)
-- Observability: Performance metrics and logs monitoring (Grafana, Prometheus) + correlation between logs/traces/metrics.
-- Package manager (Helm charts)
-- API Instrumentation (Open-Telemetry, Jaeger)
+- Release management (Helm charts)
 - Front-end: NodeJS (Express web framework)
 - Business-logic: Python (Django web-framework)
+- Observability:
+  - Performance metrics (Prometheus)
+  - Logs (Promtail, Loki, Grafana)
+  - Tracing: App integrated instrumentation (Open-Telemetry, Jaeger)
+  - Correlation between logs/traces/metrics in Grafana for faster troubleshooting
 
 **IMPORTANT: This guide is intended for development, and not for a production deployment.**
 
@@ -205,7 +208,7 @@ A [service mesh](https://istio.io/latest/about/service-mesh/) is a dedicated inf
 
 ### A - Istiod
 
-Istiod (the ’d’ is for daemon )provides service discovery, configuration and certificate management.
+Istiod (the ’d’ is for daemon) provides service discovery, configuration and certificate management.
 
 Istiod converts high level routing rules that control traffic behavior into Envoy-specific configurations, and propagates them to the sidecars at runtime (cf [documentation](https://istio.io/latest/docs/ops/deployment/architecture/#istiod))
 
