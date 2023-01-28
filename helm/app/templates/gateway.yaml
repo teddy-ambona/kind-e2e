@@ -1,0 +1,89 @@
+# We create 1 Gateway and 1 Virtual Service per namespace.
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: demo-app-gateway
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: demo-app
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - demo-app-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /demo-app/
+    rewrite:
+      uri: "/"
+    route:
+    - destination:
+        host: front-end
+        port:
+          number: 8080
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: dashboards-gateway
+  namespace: istio-system
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 80
+      name: http-dashboards
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: dashboards-vs
+  namespace: istio-system
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - dashboards-gateway
+  http:
+  - route:
+    - destination:
+        host: grafana
+        port:
+          number: 3000
+    match:
+    - uri:
+        prefix: /grafana
+  - route:
+    - destination:
+        host: tracing
+        port:
+          number: 80
+    match:
+    - uri:
+        prefix: /jaeger
+  - route:
+    - destination:
+        host: kiali
+        port:
+          number: 20001
+    match:
+    - uri:
+        prefix: /kiali
+---
